@@ -26,9 +26,14 @@ const welcomeMessage = {
 const messages = [welcomeMessage];
 
 app.post('/messages', (req, res)  =>   {
-  req.body.id = messages.length 
-  messages.push(req.body )
-  return res.send(messages)
+
+  if(req.body.from && req.body.text  ){
+    req.body.id = messages.length 
+    messages.push(req.body )
+    return  res.sendStatus(200);
+  }else{
+    return res.sendStatus(400);
+  }
 })
 
 
