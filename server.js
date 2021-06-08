@@ -28,8 +28,10 @@ const messages = [welcomeMessage];
 app.post('/messages', (req, res)  =>   {
 
   if(req.body.from && req.body.text  ){
+    const msg = {timeSmap: new Date(), ...req.body}
     req.body.id = messages.length 
-    messages.push(req.body )
+    //messages.push(req.body )  will do the push without the timeSent
+    messages.push(msg )
     return  res.sendStatus(200);
   }else{
     return res.sendStatus(400);
@@ -41,6 +43,27 @@ app.get('/messages', (req, res)  =>   {
  return  res.send(messages ) 
 } )
 
+app.get('/messages/search', (req, res)  =>   {
+  //http://localhost:3000/messages/search?text=Welcome
+  const containsText = req.query.text.toLowerCase()
+  const matches = messages.filter((m) => m.text.toLowerCase().includes(containsText))
+
+  if(matches.length){
+    res.send(matches)
+  }else{
+    res.sendStatus(400)
+  }
+
+ } )
+
+ app.get('/messages/latest', (req, res)  =>   {
+  //http://localhost:3000/messages/latest
+  
+  let latestMessages = messages.slice(Math.max(messages.length - 10, 0))
+  res.send(latestMessages);
+
+ } )
+
 app.get('/messages/:id', (req, res)  =>   {
   let idMessage = req.params.id
   let messagesFind = messages.find(e => e.id == idMessage) 
@@ -51,6 +74,8 @@ app.get('/messages/:id', (req, res)  =>   {
     res.sendStatus(400);
   }
 })
+
+
 
 app.delete('/messages/:id', (req, res)  =>   {
   let idMessage = req.params.id
